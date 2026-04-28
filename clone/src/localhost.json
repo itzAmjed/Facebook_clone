@@ -1,0 +1,45 @@
+{
+  "user": [
+    {
+      "username": "johndoe",
+      "password": "hashed-password-here",
+      "email": "john@example.com",
+      "id": "e832"
+    },
+    {
+      "id": "3e63",
+      "firstName": "gsfdg",
+      "lastName": "fsdgr",
+      "email": "gfsgrs",
+      "password": "fsdgr"
+    },
+    {
+      "id": "dd1b",
+      "firstName": "fdasf",
+      "lastName": "dafda",
+      "email": "dfa",
+      "password": "fdasf"
+    },
+    {
+      "id": "14ae",
+      "firstName": "fdasre",
+      "lastName": "fdsre",
+      "email": "216040",
+      "password": "dfaef"
+    },
+    {
+      "id": "e439",
+      "firstName": "amjed",
+      "lastName": "harkati",
+      "email": "amjed@gmail.com",
+      "password": "1508Ha1962ah",
+      "gender": "male",
+      "birthDate": {
+        "day": "3",
+        "month": "April",
+        "year": "2001"
+      },
+      "age": null
+    }
+  ]
+}
