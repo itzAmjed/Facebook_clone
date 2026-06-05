@@ -10,7 +10,7 @@ if (!isset($_SESSION['user_id'])) {
 require_once "conn.php";
 
 // ✅ Adjust the table/column names to match your DB
-$stmt = $pdo->prepare("SELECT id, first_name, last_name, profile_pic FROM register WHERE id = :id");
+$stmt = $pdo->prepare("SELECT id ,first_name, last_name, profile_pic FROM register WHERE id = :id");
 $stmt->bindParam(":id", $_SESSION['user_id']);
 $stmt->execute();
 

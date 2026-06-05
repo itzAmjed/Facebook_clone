@@ -5,7 +5,6 @@ import MainPost from "../components/MainPost";
 import Contact from "../chat_component/Contact";
 import Chatbox from "../chat_component/Newchat";
 
-
 const HomePage = () => {
   return (
     <>
@@ -14,22 +13,14 @@ const HomePage = () => {
         <div className='justify-self-start '>
           <NavLinks />
         </div>
-
         <div className='w-[550px] mt-13'>
           <MainPost />
-
-        </div>  
-
+        </div>
         <div className='justify-self-start   '>
           <Contact />
         </div>
-
-        
       </section>
       <Chatbox />
-      
-    
-      
     </>
   );
 };

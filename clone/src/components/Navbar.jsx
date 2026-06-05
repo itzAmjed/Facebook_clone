@@ -9,27 +9,29 @@ import { IoNotifications, IoMoon } from "react-icons/io5";
 import { RiSettings5Fill } from "react-icons/ri";
 import { TbLogout } from "react-icons/tb";
 import { Link, useParams } from "react-router-dom";
-
-
 import { useAuth } from "../hooks/useAuth";
-import { useUpdateFriendRequest } from "../hooks/useUpdateFriendRequest";
+
+
+import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
+import Notification from "./Notification";
+import MessageNotif from "./MessageNotif";
+
+
 
 const Navbar = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [results, setResults] = useState([]);
-  const [requests, setRequests] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
-
- 
+  const [showMessageNotif, setShowMessageNotif] = useState(false);
 
   // ✅ single source of truth for logged in user
   const { user } = useAuth();
-  const { id } = useParams();
-
   const toggleNotif = () => setShowNotification((prev) => !prev);
   const toggleDropdown = () => setShowDropdown((prev) => !prev);
+  const toggleMessageNotif = () => setShowMessageNotif((prev) => !prev);
 
   // search stays exactly the same
   useEffect(() => {
@@ -46,21 +48,20 @@ const Navbar = () => {
 
   const handleSearch = (e) => setSearchQuery(e.target.value);
 
-  // friend requests stays the same
-  useEffect(() => {
-    fetch("/api/getFriendRequ.php", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ receiver_id: id }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) setRequests(data.requests);
-      })
-      .catch((err) => console.error("Error:", err));
-  }, [id]);
- // updating friend request 
- const { updateFriendRequest } = useUpdateFriendRequest(id);
+ //logout function
+const navigate = useNavigate();
+const queryClient = useQueryClient();
+
+const handleLogout = async () => {
+  await fetch('/api/logout.php', {
+    method: 'POST',
+    credentials: 'include'
+  });
+
+  queryClient.clear(); // wipe all cached data
+  navigate('/login');  // redirect to login
+};
+  
 
   const Nav_center = "bg-transparent border-none cursor-pointer text-gray-600 hover:bg-blue-500 hover:text-white px-8 py-2 rounded-md transition-colors duration-300 ease-in-out text-2xl";
   const Nav_right = "bg-gray-300 border-none cursor-pointer text-gray-600 hover:bg-blue-500 hover:text-white p-3 rounded-full transition-colors duration-300 ease-in-out text-2xl";
@@ -126,15 +127,18 @@ const Navbar = () => {
       <div className='flex items-center gap-3'>
         {/* messenger */}
         <div className='relative group'>
-          <button className={Nav_right}><FaFacebookMessenger /></button>
+          <button onClick={toggleMessageNotif} className={Nav_right}><FaFacebookMessenger /></button>
           <div className='absolute top-full mt-2 w-full flex justify-center'>
             <span className='px-3 py-1 text-sm bg-gray-200 text-black rounded shadow hidden group-hover:block'>messenger</span>
           </div>
         </div>
+        {showMessageNotif && (
+          <MessageNotif />
+        )}
 
         {/* more */}
         <div className='relative group'>
-          <button className={Nav_right}><HiMiniSquares2X2 /></button>
+          <button  className={Nav_right}><HiMiniSquares2X2 /></button>
           <div className='absolute top-full mt-2 w-full flex justify-center'>
             <span className='px-3 py-1 text-sm bg-gray-200 text-black rounded shadow hidden group-hover:block'>more</span>
           </div>
@@ -149,31 +153,7 @@ const Navbar = () => {
         </div>
 
         {showNotification && (
-          <div className='absolute w-auto top-14 right-3 bg-[#333334] shadow-lg rounded-md p-2 text-white'>
-            <h3 className='font-bold mb-2 text-xl'>Notifications</h3>
-            {requests.length > 0 ? (
-              requests.map((req) => (
-                <div key={req.id} className='flex items-center gap-2 p-2 border-b border-gray-700'>
-                  <img src={req.profile_pic} className='w-8 h-8 rounded-full' />
-                  <span>{req.first_name} {req.last_name}</span>
-                  <div className='ml-auto flex gap-2'>
-                    {req.status === "pending" ? (
-                      <>
-                        <button className='bg-gray-500 text-white px-2 py-1 rounded hover:bg-blue-500' onClick={() => updateFriendRequest(req.id, "accept")}>Accept</button>
-                        <button className='bg-gray-500 text-white px-2 py-1 rounded hover:bg-red-500' onClick={() => updateFriendRequest(req.id, "reject")}>Decline</button>
-                      </>
-                    ) : req.status === "accepted" ? (
-                      <span className='text-green-400 font-semibold'>Accepted ✅</span>
-                    ) : req.status === "rejected" ? (
-                      <span className='text-red-400 font-semibold'>Declined ❌</span>
-                    ) : null}
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className='p-2 w-70'>No new notifications</div>
-            )}
-          </div>
+          <Notification />
         )}
 
         {/* profile dropdown */}
@@ -183,7 +163,7 @@ const Navbar = () => {
             <MdKeyboardArrowDown className='bg-gray-600 text-white text-sm rounded-full' />
           </button>
           <div className='absolute top-full mt-2 w-full flex justify-center'>
-            <span className='px-3 py-1 text-sm bg-gray-200 text-black rounded shadow opacity-0 group-hover:opacity-100 transition-opacity duration-200'>Account</span>
+            <span className='px-3 py-1 text-sm bg-gray-200 text-black rounded shadow hidden group-hover:block'>Account</span>
           </div>
         </div>
 
@@ -218,11 +198,11 @@ const Navbar = () => {
               <label className='flex items-center rounded-lg gap-2 p-2 hover:bg-[#404041] cursor-pointer'>
                 <span className='rounded-full text-xl p-1 bg-[#404041]'><MdFeedback /></span>
                 <li>Give feedback</li>
-              </label> <Link to='/login'>
-              <label className='flex items-center rounded-lg gap-2 p-2 hover:bg-[#404041] cursor-pointer'>
+              </label >
+              <label className='flex items-center rounded-lg gap-2 p-2 hover:bg-[#404041] cursor-pointer' onClick={handleLogout}>
                 <span className='rounded-full text-xl p-1 bg-[#404041]'><TbLogout /></span>
                <li>logout</li>
-              </label></Link>
+              </label>
             </ul>
           </div>
         )}

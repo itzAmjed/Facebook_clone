@@ -15,7 +15,9 @@ export function useUpdateFriendRequest(profileId) {
 
     onSuccess: () => {
       // refetch friend status after update
-      queryClient.invalidateQueries({ queryKey: ['friendStatus', profileId] });
+       queryClient.invalidateQueries({ queryKey: ['friendStatus', profileId] });
+    queryClient.invalidateQueries({ queryKey: ['friendRequests'] });
+    queryClient.invalidateQueries({ queryKey: ['friendList'] });
     },
 
     onError: (err) => console.error('Friend request update error:', err)

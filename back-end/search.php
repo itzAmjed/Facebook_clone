@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $last_Name = $data["last_Name"] ?? '';
 
     try {
-        $query = "SELECT id , first_Name, last_Name, profile_pic
+        $query = "SELECT id, first_Name, last_Name, profile_pic
                   FROM register 
                   WHERE first_Name LIKE :first_Name 
                      OR last_Name LIKE :last_Name";

@@ -36,28 +36,6 @@ if (!$receiverExists) {
     exit;
 }
 
-// ✅ Check if there’s already a relationship between these two users
-$stmt = $pdo->prepare("
-    SELECT * FROM friend_requests 
-    WHERE (sender_id = :sender_id AND receiver_id = :receiver_id)
-       OR (sender_id = :receiver_id AND receiver_id = :sender_id)
-");
-$stmt->execute(['sender_id' => $sender_id, 'receiver_id' => $receiver_id]);
-$existing = $stmt->fetch(PDO::FETCH_ASSOC);
-
-if ($existing) {
-    // handle depending on current status
-    if ($existing['status'] === 'pending') {
-        echo json_encode(["success" => false, "message" => "Friend request already pending"]);
-    } elseif ($existing['status'] === 'accepted') {
-        echo json_encode(["success" => false, "message" => "You are already friends"]);
-    } elseif ($existing['status'] === 'rejected') {
-        // you can allow resending if you want
-        echo json_encode(["success" => false, "message" => "Request was declined previously"]);
-    }
-    exit;
-}
-
 // ✅ Insert friend request
 try {
     $stmt = $pdo->prepare("INSERT INTO friend_requests (sender_id, receiver_id, status) 
